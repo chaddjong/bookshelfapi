@@ -1,6 +1,10 @@
+// [M] = Mandatory
+// [O] = Optional
+
 const books = require('./books');
 const {nanoid} = require('nanoid');
 
+// [M] Kriteria 3 : API dapat menyimpan buku
 const addBookHandler = (request, h) => {
 	const {
 		name,
@@ -13,6 +17,7 @@ const addBookHandler = (request, h) => {
 		reading,
 	} = request.payload;
 
+	// Jika properti name tidak diberikan user
 	if (name === undefined) {
 		const response = h.response({
 			status: 'fail',
@@ -23,6 +28,7 @@ const addBookHandler = (request, h) => {
 		return response;
 	}
 
+	// Jika readPage lebih besar dari pageCount
 	if (readPage > pageCount) {
 		const response = h.response({
 			status: 'fail',
@@ -79,25 +85,29 @@ const addBookHandler = (request, h) => {
 	return response;
 };
 
+// [M] Kriteria 4 : API dapat menampilkan seluruh buku
 const getAllBooksHandler = (request, h) => {
 	const {name, reading, finished} = request.query;
 
-	let filteredBooks = books;
+	let queryBooks = books;
 
+	// [O] ?name
 	if (name !== undefined) {
-		filteredBooks = filteredBooks.filter(book =>
+		queryBooks = queryBooks.filter(book =>
 			book.name.toLowerCase().includes(name.toLowerCase()),
 		);
 	}
 
+	// [O] ?reading
 	if (reading !== undefined) {
-		filteredBooks = filteredBooks.filter(
+		queryBooks = queryBooks.filter(
 			book => book.reading === Boolean(Number(reading)),
 		);
 	}
 
+	// [O] ?finished
 	if (finished !== undefined) {
-		filteredBooks = filteredBooks.filter(
+		queryBooks = queryBooks.filter(
 			book => book.finished === Boolean(Number(finished)),
 		);
 	}
@@ -105,7 +115,7 @@ const getAllBooksHandler = (request, h) => {
 	const response = h.response({
 		status: 'success',
 		data: {
-			books: filteredBooks.map(book => ({
+			books: queryBooks.map(book => ({
 				id: book.id,
 				name: book.name,
 				publisher: book.publisher,
@@ -117,6 +127,7 @@ const getAllBooksHandler = (request, h) => {
 	return response;
 };
 
+// [M] Kriteria 5 : API dapat menampilkan detail buku
 const getBookByIdHandler = (request, h) => {
 	const {bookId} = request.params;
 	const book = books.filter(b => b.id === bookId)[0];
@@ -139,8 +150,10 @@ const getBookByIdHandler = (request, h) => {
 	return response;
 };
 
+// [M] Kriteria 6 : API dapat mengubah data buku
 const editBookByIdHandler = (request, h) => {
 	const {bookId} = request.params;
+
 	const {
 		name,
 		year,
@@ -151,6 +164,7 @@ const editBookByIdHandler = (request, h) => {
 		readPage,
 		reading,
 	} = request.payload;
+
 	const updatedAt = new Date().toISOString();
 	const index = books.findIndex(book => book.id === bookId);
 
@@ -210,6 +224,7 @@ const editBookByIdHandler = (request, h) => {
 	return response;
 };
 
+// [M] Kriteria 7 : API dapat menghapus buku
 const deleteBookByIdHandler = (request, h) => {
 	const {bookId} = request.params;
 

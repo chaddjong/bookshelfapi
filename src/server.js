@@ -3,6 +3,7 @@ const Hapi = require('@hapi/hapi');
 
 const init = async () => {
 	const server = Hapi.server({
+		// [M] Kriteria 1 : Aplikasi menggunakan port 9000
 		port: 9000,
 		host: 'localhost',
 	});
